@@ -1,0 +1,83 @@
+{% extends 'bookings/base.html' %}
+{% block title %}Search Trains{% endblock %}
+{% block content %}
+
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-body">
+    <h4 class="mb-3 fw-bold text-primary">
+      <i class="bi bi-search"></i> Search Trains
+    </h4>
+
+    <form method="post" class="row g-3">
+      {% csrf_token %}
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">From</label>
+        <select name="source" class="form-select" required>
+          <option value="">Select source</option>
+          {% for st in stations %}
+            <option value="{{ st.code }}">{{ st.name }} ({{ st.code }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">To</label>
+        <select name="destination" class="form-select" required>
+          <option value="">Select destination</option>
+          {% for st in stations %}
+            <option value="{{ st.code }}">{{ st.name }} ({{ st.code }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label fw-semibold">Date</label>
+        <input name="date" type="date" class="form-control" min="{{ today }}" max="{{ max_date }}" required>
+      </div>
+
+      <div class="col-md-1 d-flex align-items-end">
+        <button class="btn btn-primary w-100" type="submit">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if results %}
+  <h4 class="fw-bold text-secondary mb-3">Available Trains</h4>
+
+  {% for r in results %}
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <h5 class="mb-1 fw-bold">
+            🚆 {{ r.train.number }} — {{ r.train.name }}
+          </h5>
+          <small class="text-muted">
+            {{ request.POST.source }} ➡ {{ request.POST.destination }} | {{ request.POST.date }}
+          </small>
+        </div>
+        <hr class="my-2">
+        
+        {% for b in r.berths %}
+          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+            <div>
+              <strong>{{ b.berth.name }} ({{ b.berth.code }})</strong>
+              <span class="text-muted">| Fare: ₹{{ b.fare_per_passenger }}</span>
+              <span class="badge bg-info ms-2">Seats left: {{ b.seats_left }}</span>
+            </div>
+            <div>
+              <a href="{% url 'book_train' r.train.id %}?source={{ request.POST.source }}&destination={{ request.POST.destination }}&date={{ request.POST.date }}&berth_code={{ b.berth.code }}" 
+                 class="btn btn-sm btn-outline-primary">
+                 Book
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% endblock %}

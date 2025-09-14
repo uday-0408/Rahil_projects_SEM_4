@@ -1,0 +1,61 @@
+{% extends 'bookings/base.html' %}
+{% block title %}Ticket — {{ booking.id }}{% endblock %}
+{% block content %}
+
+<h3 class="mb-4">🎫 Ticket — Booking #{{ booking.id }}</h3>
+
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <h5 class="card-title mb-1">{{ booking.train.number }} — {{ booking.train.name }}</h5>
+    <p class="text-muted mb-3">
+      <small>{{ booking.source }} → {{ booking.destination }}</small>
+    </p>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <p><strong>Date of Journey:</strong> {{ booking.date_of_journey }}</p>
+        <p><strong>Berth:</strong> {{ booking.berth_type.name }} ({{ booking.berth_type.code }})</p>
+      </div>
+      <div class="col-md-6">
+        <p>
+          <strong>Status:</strong> 
+          <span class="badge 
+            {% if booking.status == 'Confirmed' %} bg-success 
+            {% elif booking.status == 'Pending' %} bg-warning text-dark 
+            {% else %} bg-secondary {% endif %}">
+            {{ booking.status }}
+          </span>
+        </p>
+        <p><strong>Total Paid:</strong> ₹{{ booking.total_fare }}</p>
+      </div>
+    </div>
+
+    <h6 class="mb-2">Passenger Details</h6>
+    <table class="table table-sm table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Seat</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in booking.passengers.all %}
+          <tr>
+            <td>{{ p.name }}</td>
+            <td>{{ p.age }}</td>
+            <td>{{ p.seat_number|default:"(TBA)" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="mt-4">
+      <a href="{% url 'download_ticket' booking.pk %}" class="btn btn-outline-success">
+        Download Ticket
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

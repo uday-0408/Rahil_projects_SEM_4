@@ -1,0 +1,45 @@
+{% extends 'bookings/base.html' %}
+{% block title %}Booking Preview{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Booking Preview</h4>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <h5 class="fw-bold">
+                    {{ booking.train.number }} — {{ booking.train.name }}
+                </h5>
+                <p class="mb-1">
+                    <strong>Date of Journey:</strong> {{ booking.date_of_journey }}
+                </p>
+                <p class="mb-1">
+                    <strong>Route:</strong> {{ booking.source }} → {{ booking.destination }}
+                </p>
+                <p class="mb-1">
+                    <strong>Berth:</strong> {{ booking.berth_type.name }} ({{ booking.berth_type.code }})
+                </p>
+                <p class="mb-1">
+                    <strong>Passengers:</strong> {{ booking.passengers_count }}
+                </p>
+            </div>
+
+            <hr>
+
+            <p class="fs-5 fw-semibold">
+                Total Fare: <span class="text-success">₹{{ booking.total_fare }}</span>
+            </p>
+
+            <form method="post" action="{% url 'mock_pay' booking.id %}">
+                {% csrf_token %}
+                <button class="btn btn-success btn-lg px-4">
+                    Pay & Confirm
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

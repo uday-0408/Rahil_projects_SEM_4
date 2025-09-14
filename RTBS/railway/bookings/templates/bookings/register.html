@@ -1,0 +1,78 @@
+{% extends "bookings/base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-lg border-0">
+      <div class="card-body p-4">
+        <h3 class="text-center mb-4">Register</h3>
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            {{ form.username }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            {{ form.first_name }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            {{ form.email }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Mobile</label>
+            {{ form.mobile }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">DOB</label>
+            {{ form.dob }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Gender</label>
+            {{ form.gender }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            {{ form.password1 }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Confirm password</label>
+            {{ form.password2 }}
+          </div>
+
+          <button class="btn btn-primary w-100 mb-3" type="submit">Register</button>
+
+          <div class="text-center">
+            <small>Already have an account? 
+              <a href="{% url 'login' %}">Login here</a>
+            </small>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  input, select, textarea {
+    width: 100% !important;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .card {
+    border-radius: 12px;
+  }
+  .form-label {
+    font-weight: 500;
+  }
+</style>
+{% endblock %}

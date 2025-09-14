@@ -1,0 +1,106 @@
+{% extends "bookings/base.html" %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <h4 class="mb-4">Book {{ train.number }} — {{ train.name }}</h4>
+
+    <form method="post" id="booking-form" class="mb-3">
+      {% csrf_token %}
+
+      <div id="passenger-forms">
+        {{ formset.management_form }}
+        {% for form in formset.forms %}
+        <div class="passenger-item mb-3 p-3 border rounded bg-light">
+          <div class="row g-3">
+            <div class="col-md-5">
+              {{ form.name.label_tag }} 
+              {{ form.name }}
+            </div>
+            <div class="col-md-5">
+              {{ form.age.label_tag }} 
+              {{ form.age }}
+            </div>
+            <div class="col-md-2">
+              {{ form.gender.label_tag }} 
+              {{ form.gender }}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="mb-4">
+        <button type="button" id="add-passenger" class="btn btn-sm btn-outline-primary">
+          + Add Passenger
+        </button>
+        <small class="text-muted ms-2">Maximum 5 passengers.</small>
+      </div>
+
+      <!-- Preserve search context -->
+      <input type="hidden" name="source" value="{{ source|default:'' }}">
+      <input type="hidden" name="destination" value="{{ destination|default:'' }}">
+      <input type="hidden" name="date" value="{{ date|default:'' }}">
+      <input type="hidden" name="berth_code" value="{{ berth_code|default:'' }}">
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" type="submit">
+          Continue to Preview
+        </button>
+        <a class="btn btn-secondary" href="{% url 'search_trains' %}">
+          Back to Search
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const addBtn = document.getElementById("add-passenger");
+    const formsContainer = document.getElementById("passenger-forms");
+    const totalFormsInput =
+      document.querySelector("#id_{{ formset.prefix }}-TOTAL_FORMS") ||
+      document.querySelector('input[name="{{ formset.management_form.prefix }}-TOTAL_FORMS"]') ||
+      document.querySelector('input[name="form-TOTAL_FORMS"]');
+
+    function getTotalForms() {
+      return parseInt(totalFormsInput.value, 10);
+    }
+    function setTotalForms(n) {
+      totalFormsInput.value = String(n);
+    }
+
+    addBtn.addEventListener("click", function () {
+      let total = getTotalForms();
+      if (total >= 5) {
+        alert("Maximum 5 passengers allowed.");
+        return;
+      }
+      const last = formsContainer.querySelectorAll(".passenger-item")[formsContainer.querySelectorAll(".passenger-item").length - 1];
+      const clone = last.cloneNode(true);
+
+      clone.querySelectorAll("input, select, textarea, label").forEach(function (node) {
+        if (node.name) {
+          node.name = node.name.replace(/-\d+-/, "-" + total + "-");
+        }
+        if (node.id) {
+          node.id = node.id.replace(/-\d+-/, "-" + total + "-");
+        }
+        if (node.htmlFor) {
+          node.htmlFor = node.htmlFor.replace(/-\d+-/, "-" + total + "-");
+        }
+        if (node.tagName === "INPUT") {
+          if (node.type === "text" || node.type === "number") node.value = "";
+          if (node.type === "checkbox" || node.type === "radio") node.checked = false;
+        } else if (node.tagName === "SELECT") {
+          node.selectedIndex = 0;
+        }
+      });
+
+      formsContainer.appendChild(clone);
+      setTotalForms(total + 1);
+    });
+  })();
+</script>
+{% endblock %}
